@@ -4,6 +4,7 @@ import com.example.assignment.client.OpenWeatherClient;
 import com.example.assignment.dto.OpenWeatherDTO;
 import com.example.assignment.dto.ResponseDTO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -12,8 +13,8 @@ public class WeatherService {
 
     private final OpenWeatherClient openWeatherClient;
 
+    @Cacheable(value = "weather", key = "#city.toLowerCase()")
     public ResponseDTO getWeatherForCity(String city) {
-
         OpenWeatherDTO dto = openWeatherClient.getWeather(city);
 
         if (dto == null ||
@@ -26,17 +27,8 @@ public class WeatherService {
 
         String condition = dto.getWeather().get(0).getDescription();
         Double temperature = dto.getMain().getTemp();
-
         Double windSpeedKmh = dto.getWind().getSpeed() * 3.6;
 
-        if (windSpeedKmh < 0) {
-            windSpeedKmh = 0.0;
-        }
-
-        return new ResponseDTO(
-                condition,
-                temperature,
-                windSpeedKmh
-        );
+        return new ResponseDTO(condition, temperature, windSpeedKmh);
     }
 }
