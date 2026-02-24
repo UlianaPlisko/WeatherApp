@@ -16,6 +16,14 @@ public class WeatherService {
 
         OpenWeatherDTO dto = openWeatherClient.getWeather(city);
 
+        if (dto == null ||
+                dto.getWeather() == null ||
+                dto.getWeather().isEmpty() ||
+                dto.getMain() == null ||
+                dto.getWind() == null) {
+            throw new IllegalStateException("Incomplete weather data for city: " + city);
+        }
+
         String condition = dto.getWeather().get(0).getDescription();
         Double temperature = dto.getMain().getTemp();
 
